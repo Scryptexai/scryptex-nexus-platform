@@ -1,0 +1,42 @@
+
+node_modules
+.env
+coverage
+coverage.json
+typechain-types
+cache
+artifacts
+dist
+
+# Hardhat files
+cache
+artifacts
+
+# TypeChain
+typechain
+typechain-types
+
+# solidity-coverage files
+coverage/
+coverage.json
+
+# Deployment files
+deployments/localhost/
+.openzeppelin/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
