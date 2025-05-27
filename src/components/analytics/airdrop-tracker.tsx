@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Parachute, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { Gift, CheckCircle, Clock, AlertCircle } from "lucide-react"
 
 export function AirdropTracker() {
   const airdrops = [
@@ -34,7 +34,7 @@ export function AirdropTracker() {
     <Card className="cyber-border">
       <CardHeader>
         <CardTitle className="cyber-text flex items-center gap-2">
-          <Parachute className="h-5 w-5" />
+          <Gift className="h-5 w-5" />
           Airdrop Tracker
         </CardTitle>
         <CardDescription>Track your airdrop eligibility across all chains</CardDescription>
