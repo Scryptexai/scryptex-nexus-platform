@@ -3,8 +3,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Factory, ArrowRightLeft, Trophy, Plus, TrendingUp, Users } from 'lucide-react'
-import Link from 'next/link'
+import { Factory, ArrowRightLeft, Trophy, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const quickActions = [
   {
@@ -48,7 +48,7 @@ export function QuickActions() {
       </CardHeader>
       <CardContent className="space-y-3">
         {quickActions.map((action, index) => (
-          <Link key={index} href={action.href}>
+          <Link key={index} to={action.href}>
             <Button
               variant="outline"
               className="w-full justify-start h-auto p-4 hover:bg-secondary/50 transition-colors"

@@ -23,8 +23,7 @@ import {
   Settings,
   Zap
 } from "lucide-react"
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { Link, useLocation } from 'react-router-dom'
 
 const menuItems = [
   {
@@ -68,7 +67,7 @@ const utilityItems = [
 ]
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const location = useLocation()
 
   return (
     <Sidebar className="border-r border-border/50">
@@ -93,10 +92,10 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild 
-                    isActive={pathname === item.url}
+                    isActive={location.pathname === item.url}
                     className="hover:cyber-glow transition-all duration-300"
                   >
-                    <Link href={item.url}>
+                    <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -115,9 +114,9 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
-                    isActive={pathname === item.url}
+                    isActive={location.pathname === item.url}
                   >
-                    <Link href={item.url}>
+                    <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>

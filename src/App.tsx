@@ -1,27 +1,30 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import RootLayout from './app/layout'
+import Index from './pages/Index'
+import TokensPage from './app/tokens/page'
+import NotFound from './pages/NotFound'
+import './App.css'
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+function App() {
+  return (
+    <Router>
+      <RootLayout>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/tokens" element={<TokensPage />} />
+          <Route path="/tokens/create" element={<div>Token Creation Page</div>} />
+          <Route path="/trading" element={<div>Trading Hub</div>} />
+          <Route path="/trading/swap" element={<div>Swap Interface</div>} />
+          <Route path="/community" element={<div>Community Hub</div>} />
+          <Route path="/quests" element={<div>Quests Page</div>} />
+          <Route path="/analytics" element={<div>Analytics Dashboard</div>} />
+          <Route path="/settings" element={<div>Settings Page</div>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </RootLayout>
+    </Router>
+  )
+}
 
-export default App;
+export default App
