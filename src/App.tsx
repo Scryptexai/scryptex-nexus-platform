@@ -3,6 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import RootLayout from './app/layout'
 import Index from './pages/Index'
 import TokensPage from './app/tokens/page'
+import TokenCreate from './pages/TokenCreate'
+import Trading from './pages/Trading'
+import TradingSwap from './pages/TradingSwap'
+import Community from './pages/Community'
+import Quests from './pages/Quests'
+import Analytics from './pages/Analytics'
+import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import './App.css'
 
@@ -13,13 +20,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/tokens" element={<TokensPage />} />
-          <Route path="/tokens/create" element={<div>Token Creation Page</div>} />
-          <Route path="/trading" element={<div>Trading Hub</div>} />
-          <Route path="/trading/swap" element={<div>Swap Interface</div>} />
-          <Route path="/community" element={<div>Community Hub</div>} />
-          <Route path="/quests" element={<div>Quests Page</div>} />
-          <Route path="/analytics" element={<div>Analytics Dashboard</div>} />
-          <Route path="/settings" element={<div>Settings Page</div>} />
+          <Route path="/tokens/create" element={<TokenCreate />} />
+          <Route path="/trading" element={<Trading />} />
+          <Route path="/trading/swap" element={<TradingSwap />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/quests" element={<Quests />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </RootLayout>

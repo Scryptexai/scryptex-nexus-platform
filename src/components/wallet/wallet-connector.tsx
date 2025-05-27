@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChainSelector } from './chain-selector'
+import { WalletSelector } from './wallet-selector'
 import { 
   Dialog,
   DialogContent,
@@ -17,9 +18,11 @@ import { Wallet, ChevronDown } from 'lucide-react'
 export function WalletConnector() {
   const [isConnected, setIsConnected] = useState(false)
   const [selectedChain, setSelectedChain] = useState('risechain')
+  const [selectedWallet, setSelectedWallet] = useState('')
   const [address, setAddress] = useState('')
 
-  const handleConnect = (chain: string) => {
+  const handleConnect = (wallet: string, chain: string) => {
+    setSelectedWallet(wallet)
     setSelectedChain(chain)
     setIsConnected(true)
     // Simulate wallet connection
@@ -29,6 +32,7 @@ export function WalletConnector() {
   const handleDisconnect = () => {
     setIsConnected(false)
     setAddress('')
+    setSelectedWallet('')
   }
 
   if (isConnected) {
@@ -36,7 +40,9 @@ export function WalletConnector() {
       <div className="flex items-center gap-2">
         <div className="text-sm">
           <div className="font-medium">{address}</div>
-          <div className="text-xs text-muted-foreground capitalize">{selectedChain}</div>
+          <div className="text-xs text-muted-foreground capitalize">
+            {selectedWallet} • {selectedChain}
+          </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleDisconnect}>
           Disconnect
@@ -58,10 +64,10 @@ export function WalletConnector() {
         <DialogHeader>
           <DialogTitle>Connect Your Wallet</DialogTitle>
           <DialogDescription>
-            Select a chain to connect your wallet. The platform will handle cross-chain operations automatically.
+            Select your preferred wallet and chain to start farming across the ecosystem.
           </DialogDescription>
         </DialogHeader>
-        <ChainSelector onSelect={handleConnect} />
+        <WalletSelector onConnect={handleConnect} />
       </DialogContent>
     </Dialog>
   )
