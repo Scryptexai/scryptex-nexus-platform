@@ -6,6 +6,7 @@ import TokensPage from './app/tokens/page'
 import TokenCreate from './pages/TokenCreate'
 import Trading from './pages/Trading'
 import TradingSwap from './pages/TradingSwap'
+import Bridge from './pages/Bridge'
 import Community from './pages/Community'
 import Quests from './pages/Quests'
 import Analytics from './pages/Analytics'
@@ -23,6 +24,7 @@ function App() {
           <Route path="/tokens/create" element={<TokenCreate />} />
           <Route path="/trading" element={<Trading />} />
           <Route path="/trading/swap" element={<TradingSwap />} />
+          <Route path="/bridge" element={<Bridge />} />
           <Route path="/community" element={<Community />} />
           <Route path="/quests" element={<Quests />} />
           <Route path="/analytics" element={<Analytics />} />
