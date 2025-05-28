@@ -6,10 +6,16 @@ interface ApiResponse<T> {
   errors?: Record<string, string[]>
 }
 
-interface ApiError {
-  message: string
+class ApiError extends Error {
   status: number
   errors?: Record<string, string[]>
+
+  constructor(params: { message: string; status: number; errors?: Record<string, string[]> }) {
+    super(params.message)
+    this.name = 'ApiError'
+    this.status = params.status
+    this.errors = params.errors
+  }
 }
 
 class ApiClient {
