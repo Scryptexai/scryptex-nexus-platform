@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react'
@@ -7,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowUpDown, TrendingUp, DollarSign, Bridge } from 'lucide-react'
+import { ArrowUpDown, TrendingUp, DollarSign, ArrowLeftRight } from 'lucide-react'
 
 interface TokenBalance {
   address: string
@@ -245,7 +244,7 @@ export function MultiChainPortfolio() {
                     <CardDescription>Assets on this chain</CardDescription>
                   </div>
                   <Button variant="outline" size="sm">
-                    <Bridge className="h-4 w-4 mr-2" />
+                    <ArrowLeftRight className="h-4 w-4 mr-2" />
                     Bridge Assets
                   </Button>
                 </div>

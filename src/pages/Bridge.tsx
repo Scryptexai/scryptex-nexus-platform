@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CrossChainSwap } from "@/components/bridge/CrossChainSwap"
 import { BridgeTracker } from "@/components/bridge/BridgeTracker"
 import { MultiChainPortfolio } from "@/components/bridge/MultiChainPortfolio"
-import { Bridge, ArrowUpDown, Wallet, BarChart3 } from "lucide-react"
+import { ArrowLeftRight, ArrowUpDown, Wallet, BarChart3 } from "lucide-react"
 
 export default function BridgePage() {
   return (
@@ -13,7 +13,7 @@ export default function BridgePage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
-            <Bridge className="h-8 w-8 text-primary" />
+            <ArrowLeftRight className="h-8 w-8 text-primary" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Cross-Chain Bridge
             </h1>
@@ -32,7 +32,7 @@ export default function BridgePage() {
               <span className="hidden sm:inline">Bridge</span>
             </TabsTrigger>
             <TabsTrigger value="tracker" className="flex items-center gap-2">
-              <Bridge className="h-4 w-4" />
+              <ArrowLeftRight className="h-4 w-4" />
               <span className="hidden sm:inline">Tracker</span>
             </TabsTrigger>
             <TabsTrigger value="portfolio" className="flex items-center gap-2">

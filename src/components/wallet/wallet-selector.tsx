@@ -9,6 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ExternalLink, Download } from 'lucide-react'
 
+// Add wallet type declarations
+declare global {
+  interface Window {
+    ethereum?: any
+    okxwallet?: any
+  }
+}
+
 const SUPPORTED_WALLETS = [
   {
     id: 'metamask',

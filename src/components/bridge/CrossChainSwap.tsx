@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react'
@@ -8,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowDown, ArrowUpDown, Bridge, Clock, DollarSign } from 'lucide-react'
+import { ArrowDown, ArrowUpDown, ArrowLeftRight, Clock, DollarSign } from 'lucide-react'
 
 interface Token {
   address: string
@@ -163,7 +162,7 @@ export function CrossChainSwap() {
     <Card className="w-full max-w-lg mx-auto cyber-border">
       <CardHeader>
         <CardTitle className="cyber-text flex items-center gap-2">
-          <Bridge className="h-5 w-5" />
+          <ArrowLeftRight className="h-5 w-5" />
           Cross-Chain Bridge
         </CardTitle>
         <CardDescription>
