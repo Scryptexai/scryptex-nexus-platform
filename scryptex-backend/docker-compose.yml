@@ -1,0 +1,175 @@
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: scryptex-postgres
+    environment:
+      POSTGRES_DB: scryptex_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - scryptex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d scryptex_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: scryptex-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - scryptex-network
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SCRYPTEX Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: scryptex-api
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      WEBSOCKET_PORT: 3002
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/scryptex_dev
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - scryptex-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Background Job Processor
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: scryptex-worker
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/scryptex_dev
+      REDIS_URL: redis://redis:6379
+      ENABLE_WEBSOCKETS: false
+      ENABLE_BACKGROUND_JOBS: true
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - scryptex-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: ["node", "dist/jobs/index.js"]
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: scryptex-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - scryptex-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: scryptex-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - scryptex-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+  # Grafana Dashboard (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: scryptex-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - scryptex-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  scryptex-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
