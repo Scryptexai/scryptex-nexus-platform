@@ -27,26 +27,30 @@ const config: HardhatUserConfig = {
     risechain: {
       url: "https://testnet.riselabs.xyz",
       chainId: 11155931,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.RISECHAIN_DEPLOYER_PRIVATE_KEY ? [process.env.RISECHAIN_DEPLOYER_PRIVATE_KEY] : [],
       gasPrice: 20000000000,
+      timeout: 60000,
     },
     abstract: {
       url: "https://api.testnet.abs.xyz",
       chainId: 11124,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.ABSTRACT_DEPLOYER_PRIVATE_KEY ? [process.env.ABSTRACT_DEPLOYER_PRIVATE_KEY] : [],
       gasPrice: 20000000000,
+      timeout: 60000,
     },
     og: {
       url: "https://evmrpc-testnet.0g.ai/",
       chainId: 16601,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.OG_DEPLOYER_PRIVATE_KEY ? [process.env.OG_DEPLOYER_PRIVATE_KEY] : [],
       gasPrice: 20000000000,
+      timeout: 60000,
     },
     somnia: {
       url: "https://vsf-rpc.somnia.network/",
       chainId: 50312,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.SOMNIA_DEPLOYER_PRIVATE_KEY ? [process.env.SOMNIA_DEPLOYER_PRIVATE_KEY] : [],
       gasPrice: 20000000000,
+      timeout: 60000,
     },
   },
   gasReporter: {
@@ -60,6 +64,40 @@ const config: HardhatUserConfig = {
       og: process.env.OG_API_KEY || "",
       somnia: process.env.SOMNIA_API_KEY || "",
     },
+    customChains: [
+      {
+        network: "risechain",
+        chainId: 11155931,
+        urls: {
+          apiURL: "https://explorer.testnet.riselabs.xyz/api",
+          browserURL: "https://explorer.testnet.riselabs.xyz"
+        }
+      },
+      {
+        network: "abstract",
+        chainId: 11124,
+        urls: {
+          apiURL: "https://api.testnet.abs.xyz/api",
+          browserURL: "https://sepolia.abscan.org"
+        }
+      },
+      {
+        network: "og",
+        chainId: 16601,
+        urls: {
+          apiURL: "https://chainscan-galileo.0g.ai/api",
+          browserURL: "https://chainscan-galileo.0g.ai"
+        }
+      },
+      {
+        network: "somnia",
+        chainId: 50312,
+        urls: {
+          apiURL: "https://shannon-explorer.somnia.network/api",
+          browserURL: "https://shannon-explorer.somnia.network"
+        }
+      }
+    ]
   },
   typechain: {
     outDir: "typechain-types",

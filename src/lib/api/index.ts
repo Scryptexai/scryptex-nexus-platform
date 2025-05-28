@@ -24,7 +24,7 @@ export const handleApiError = (error: unknown): string => {
 }
 
 // Utility function to format API responses
-export const formatApiResponse = <T>(response: ApiResponse<T>) => {
+export const formatApiResponse = <T>(response: { data: T; success: boolean; message?: string }) => {
   if (!response.success) {
     throw new Error(response.message || 'API request failed')
   }

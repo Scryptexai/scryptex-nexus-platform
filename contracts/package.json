@@ -7,15 +7,25 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
-    "deploy:risechain": "hardhat run scripts/deploy.ts --network risechain",
-    "deploy:abstract": "hardhat run scripts/deploy.ts --network abstract",
-    "deploy:og": "hardhat run scripts/deploy.ts --network og",
-    "deploy:somnia": "hardhat run scripts/deploy.ts --network somnia",
-    "verify": "hardhat run scripts/verify-contracts.ts",
-    "test:integration": "hardhat test test/Integration.test.ts",
+    "typechain": "hardhat typechain",
     "clean": "hardhat clean",
-    "typechain": "hardhat typechain"
+    
+    "generate-wallets": "npx ts-node scripts/generate-wallets.ts",
+    "check-balances": "npx ts-node scripts/check-balances.ts",
+    
+    "deploy": "hardhat run scripts/deploy.ts",
+    "deploy:risechain": "hardhat run scripts/deploy-risechain.ts --network risechain",
+    "deploy:abstract": "hardhat run scripts/deploy-abstract.ts --network abstract",
+    "deploy:og": "hardhat run scripts/deploy-og.ts --network og",
+    "deploy:somnia": "hardhat run scripts/deploy-somnia.ts --network somnia",
+    "deploy:all": "npm run deploy:risechain && npm run deploy:abstract && npm run deploy:og && npm run deploy:somnia",
+    
+    "export-addresses": "npx ts-node scripts/export-addresses.ts",
+    "verify:all": "npx ts-node scripts/verify-contracts.ts",
+    "status": "npx ts-node scripts/deployment-status.ts",
+    
+    "verify": "hardhat run scripts/verify-contracts.ts",
+    "test:integration": "hardhat test test/Integration.test.ts"
   },
   "keywords": ["blockchain", "defi", "multi-chain", "testnet", "farming"],
   "author": "SCRYPTEX Team",
@@ -30,6 +40,7 @@
     "@typechain/hardhat": "^9.0.0",
     "@types/chai": "^4.2.0",
     "@types/mocha": ">=9.1.0",
+    "@types/node": "^20.0.0",
     "chai": "^4.2.0",
     "hardhat": "^2.19.0",
     "hardhat-deploy": "^0.11.45",
