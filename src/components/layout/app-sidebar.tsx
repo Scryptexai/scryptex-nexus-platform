@@ -21,7 +21,8 @@ import {
   Trophy, 
   BarChart3, 
   Settings,
-  Zap
+  Zap,
+  ArrowLeftRight
 } from "lucide-react"
 import { Link, useLocation } from 'react-router-dom'
 
@@ -40,6 +41,11 @@ const menuItems = [
     title: "Trading Hub",
     url: "/trading",
     icon: TrendingUp,
+  },
+  {
+    title: "Cross-Chain Bridge",
+    url: "/bridge",
+    icon: ArrowLeftRight,
   },
   {
     title: "Community",
