@@ -1,322 +1,142 @@
 
 import dotenv from 'dotenv';
-import Joi from 'joi';
-import { logger } from '@/utils/logger';
 
-// Load environment variables
 dotenv.config();
 
-// Environment validation schema
-const envSchema = Joi.object({
-  NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
-  PORT: Joi.number().default(3001),
-  WEBSOCKET_PORT: Joi.number().default(3002),
-  CORS_ORIGIN: Joi.string().default('http://localhost:3000'),
-  API_PREFIX: Joi.string().default('/api'),
+export const config = {
+  // Server Configuration
+  server: {
+    port: parseInt(process.env.PORT || '3000'),
+    env: process.env.NODE_ENV || 'development',
+    apiVersion: process.env.API_VERSION || 'v1',
+    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  },
 
-  // Database
-  DATABASE_URL: Joi.string().required(),
-  DB_HOST: Joi.string().default('localhost'),
-  DB_PORT: Joi.number().default(5432),
-  DB_NAME: Joi.string().required(),
-  DB_USER: Joi.string().required(),
-  DB_PASSWORD: Joi.string().required(),
-  DB_SSL: Joi.boolean().default(false),
-
-  // Redis
-  REDIS_URL: Joi.string().default('redis://localhost:6379'),
-  REDIS_HOST: Joi.string().default('localhost'),
-  REDIS_PORT: Joi.number().default(6379),
-  REDIS_PASSWORD: Joi.string().allow('').default(''),
-  REDIS_DB: Joi.number().default(0),
-  JOB_QUEUE_REDIS_DB: Joi.number().default(1),
+  // Database Configuration
+  database: {
+    url: process.env.DATABASE_URL || 'postgresql://username:password@localhost:5432/scryptex',
+    redis: process.env.REDIS_URL || 'redis://localhost:6379',
+  },
 
   // Security
-  JWT_SECRET: Joi.string().required(),
-  JWT_EXPIRE: Joi.string().default('7d'),
-  ENCRYPTION_KEY: Joi.string().length(32).required(),
-  BCRYPT_ROUNDS: Joi.number().default(12),
-
-  // Blockchain RPCs
-  RISECHAIN_RPC_URL: Joi.string().uri().required(),
-  RISECHAIN_WS_URL: Joi.string().uri().optional(),
-  ABSTRACT_RPC_URL: Joi.string().uri().required(),
-  ABSTRACT_WS_URL: Joi.string().uri().optional(),
-  OG_RPC_URL: Joi.string().uri().required(),
-  OG_WS_URL: Joi.string().uri().optional(),
-  SOMNIA_RPC_URL: Joi.string().uri().required(),
-  SOMNIA_WS_URL: Joi.string().uri().optional(),
-  SEPOLIA_RPC_URL: Joi.string().uri().required(),
-  SEPOLIA_WS_URL: Joi.string().uri().optional(),
-
-  // Contract addresses
-  RISECHAIN_SCRYPTEX_FACTORY: Joi.string().optional(),
-  RISECHAIN_TOKEN_FACTORY: Joi.string().optional(),
-  RISECHAIN_SCRYPTEX_DEX: Joi.string().optional(),
-  RISECHAIN_LIQUIDITY_MANAGER: Joi.string().optional(),
-  RISECHAIN_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
-  
-  ABSTRACT_COMMUNITY_MANAGER: Joi.string().optional(),
-  ABSTRACT_GOVERNANCE_VOTING: Joi.string().optional(),
-  ABSTRACT_REPUTATION_SYSTEM: Joi.string().optional(),
-  ABSTRACT_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
-  
-  OG_ACTIVITY_TRACKER: Joi.string().optional(),
-  OG_METRICS_COLLECTOR: Joi.string().optional(),
-  OG_FARMING_CALCULATOR: Joi.string().optional(),
-  OG_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
-  
-  SOMNIA_QUEST_MANAGER: Joi.string().optional(),
-  SOMNIA_ACHIEVEMENT_NFT: Joi.string().optional(),
-  SOMNIA_REWARD_DISTRIBUTOR: Joi.string().optional(),
-  SOMNIA_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
-
-  SEPOLIA_BRIDGE_CONTRACT: Joi.string().optional(),
-  SEPOLIA_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
-
-  // Platform wallet private keys
-  RISECHAIN_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
-  RISECHAIN_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
-  ABSTRACT_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
-  ABSTRACT_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
-  OG_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
-  OG_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
-  SOMNIA_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
-  SOMNIA_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
-  SEPOLIA_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
-  SEPOLIA_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
-
-  // Feature flags
-  ENABLE_WEBSOCKETS: Joi.boolean().default(true),
-  ENABLE_BACKGROUND_JOBS: Joi.boolean().default(true),
-  ENABLE_ANALYTICS_TRACKING: Joi.boolean().default(true),
-  ENABLE_FARMING_AUTOMATION: Joi.boolean().default(true),
-  ENABLE_SOCIAL_FEATURES: Joi.boolean().default(true),
-  ENABLE_GAMING_FEATURES: Joi.boolean().default(true),
-
-  // External services
-  SENTRY_DSN: Joi.string().uri().optional(),
-  DISCORD_WEBHOOK_URL: Joi.string().uri().optional(),
-  TELEGRAM_BOT_TOKEN: Joi.string().optional(),
-  TELEGRAM_CHAT_ID: Joi.string().optional(),
-
-  // Performance
-  RATE_LIMIT_WINDOW_MS: Joi.number().default(900000),
-  RATE_LIMIT_MAX_REQUESTS: Joi.number().default(100),
-  CACHE_TTL_SECONDS: Joi.number().default(300),
-  MAX_CONCURRENT_BLOCKCHAIN_CALLS: Joi.number().default(10),
-  BLOCKCHAIN_TIMEOUT_MS: Joi.number().default(30000),
-
-  // Logging
-  LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug').default('info'),
-  LOG_CONSOLE_ENABLED: Joi.boolean().default(true),
-  LOG_FILE_ENABLED: Joi.boolean().default(true),
-  LOG_DB_ENABLED: Joi.boolean().default(false)
-}).unknown();
-
-const { error, value: envVars } = envSchema.validate(process.env);
-
-if (error) {
-  throw new Error(`Environment validation error: ${error.message}`);
-}
-
-export const config = {
-  env: envVars.NODE_ENV,
-  server: {
-    port: envVars.PORT
-  },
-  websocket: {
-    port: envVars.WEBSOCKET_PORT
-  },
-  api: {
-    prefix: envVars.API_PREFIX
-  },
-  cors: {
-    origin: envVars.CORS_ORIGIN
-  },
-  database: {
-    url: envVars.DATABASE_URL,
-    host: envVars.DB_HOST,
-    port: envVars.DB_PORT,
-    name: envVars.DB_NAME,
-    user: envVars.DB_USER,
-    password: envVars.DB_PASSWORD,
-    ssl: envVars.DB_SSL,
-    dialect: 'postgres' as const,
-    pool: {
-      max: 20,
-      min: 2,
-      acquire: 30000,
-      idle: 10000
-    },
-    logging: envVars.NODE_ENV === 'development' ? console.log : false
-  },
-  redis: {
-    url: envVars.REDIS_URL,
-    host: envVars.REDIS_HOST,
-    port: envVars.REDIS_PORT,
-    password: envVars.REDIS_PASSWORD,
-    db: envVars.REDIS_DB,
-    jobQueueDb: envVars.JOB_QUEUE_REDIS_DB
-  },
   security: {
-    jwtSecret: envVars.JWT_SECRET,
-    jwtExpire: envVars.JWT_EXPIRE,
-    encryptionKey: envVars.ENCRYPTION_KEY,
-    bcryptRounds: envVars.BCRYPT_ROUNDS
+    jwtSecret: process.env.JWT_SECRET || 'your_super_secret_jwt_key_minimum_32_characters',
+    encryptionKey: process.env.ENCRYPTION_KEY || 'your_encryption_key_32_chars',
+    bridgeFeePercentage: parseFloat(process.env.BRIDGE_FEE_PERCENTAGE || '0.1'),
+    pumpFeePercentage: parseFloat(process.env.PUMP_FEE_PERCENTAGE || '1.0'),
   },
-  blockchain: {
+
+  // External APIs
+  external: {
+    infuraProjectId: process.env.INFURA_PROJECT_ID || '',
+    alchemyApiKey: process.env.ALCHEMY_API_KEY || '',
+    coingeckoApiKey: process.env.COINGECKO_API_KEY || '',
+    defillamaApiKey: process.env.DEFILLAMA_API_KEY || '',
+  },
+
+  // Monitoring
+  monitoring: {
+    sentryDsn: process.env.SENTRY_DSN || '',
+    logLevel: process.env.LOG_LEVEL || 'info',
+    metricsPort: parseInt(process.env.METRICS_PORT || '9090'),
+  },
+
+  // WebSocket
+  websocket: {
+    port: parseInt(process.env.WS_PORT || '3001'),
+    corsOrigin: process.env.WS_CORS_ORIGIN || 'http://localhost:5173',
+  },
+
+  // Chain Configurations
+  chains: {
+    sepolia: {
+      chainId: 11155111,
+      name: 'Sepolia Testnet',
+      rpc: process.env.SEPOLIA_RPC_URL || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY',
+      websocket: process.env.SEPOLIA_WS_URL || 'wss://sepolia.infura.io/ws/v3/YOUR_INFURA_KEY',
+      explorer: 'https://sepolia.etherscan.io',
+      faucet: 'https://sepoliafaucet.com',
+      currency: 'ETH',
+      type: 'ETHEREUM_TESTNET' as const,
+      specialization: 'MAIN_BRIDGE_HUB',
+      features: ['stable', 'well_documented', 'high_liquidity'],
+      isMainTest: true,
+      privateKey: process.env.SEPOLIA_PRIVATE_KEY || '',
+      contracts: {
+        bridge: process.env.SEPOLIA_BRIDGE_CONTRACT || '',
+        pump: process.env.SEPOLIA_PUMP_CONTRACT || '',
+        tokenFactory: process.env.SEPOLIA_TOKEN_FACTORY || '',
+      },
+    },
     risechain: {
       chainId: 11155931,
-      name: 'RISE Testnet',
-      rpc: envVars.RISECHAIN_RPC_URL,
-      ws: envVars.RISECHAIN_WS_URL,
+      name: 'RiseChain Testnet',
+      rpc: process.env.RISECHAIN_RPC_URL || 'https://testnet.riselabs.xyz',
+      websocket: process.env.RISECHAIN_WS_URL || 'wss://testnet.riselabs.xyz/ws',
       explorer: 'https://explorer.testnet.riselabs.xyz',
-      currency: { symbol: 'ETH', decimals: 18 },
-      role: 'TRADING_ENGINE',
-      features: ['token_creation', 'dex_trading', 'liquidity_management', 'high_speed_trading']
+      faucet: 'https://faucet.testnet.riselabs.xyz',
+      currency: 'ETH',
+      type: 'L2_OPTIMIZED' as const,
+      specialization: 'ULTRA_FAST_TRADING',
+      features: ['shreds', 'parallel_execution', 'gigagas'],
+      privateKey: process.env.RISECHAIN_PRIVATE_KEY || '',
+      contracts: {
+        bridge: process.env.RISECHAIN_BRIDGE_CONTRACT || '',
+        pump: process.env.RISECHAIN_PUMP_CONTRACT || '',
+      },
     },
     abstract: {
       chainId: 11124,
       name: 'Abstract Testnet',
-      rpc: envVars.ABSTRACT_RPC_URL,
-      ws: envVars.ABSTRACT_WS_URL,
-      explorer: 'https://sepolia.abscan.org/',
-      currency: { symbol: 'ETH', decimals: 18 },
-      role: 'SOCIAL_HUB',
-      features: ['community_management', 'governance_voting', 'social_features', 'user_reputation']
+      rpc: process.env.ABSTRACT_RPC_URL || 'https://api.testnet.abs.xyz',
+      websocket: process.env.ABSTRACT_WS_URL || 'wss://api.testnet.abs.xyz/ws',
+      explorer: 'https://sepolia.abscan.org',
+      currency: 'ETH',
+      type: 'ZK_ROLLUP' as const,
+      specialization: 'SOCIAL_CONSUMER_APPS',
+      features: ['agw_wallet', 'zk_stack', 'social_primitives'],
+      privateKey: process.env.ABSTRACT_PRIVATE_KEY || '',
+      agwConfig: process.env.ABSTRACT_AGW_CONFIG || '',
+      contracts: {
+        bridge: process.env.ABSTRACT_BRIDGE_CONTRACT || '',
+        pump: process.env.ABSTRACT_PUMP_CONTRACT || '',
+      },
     },
-    og: {
+    zerog: {
       chainId: 16601,
-      name: '0G Galileo',
-      rpc: envVars.OG_RPC_URL,
-      ws: envVars.OG_WS_URL,
-      explorer: 'https://chainscan-galileo.0g.ai/',
-      currency: { symbol: 'OG', decimals: 18 },
-      role: 'DATA_LAYER',
-      features: ['activity_tracking', 'metrics_collection', 'data_storage', 'analytics_processing']
+      name: '0G Galileo Testnet',
+      rpc: process.env.ZEROG_RPC_URL || 'https://evmrpc-testnet.0g.ai',
+      explorer: 'https://chainscan-galileo.0g.ai',
+      faucet: 'https://faucet.0g.ai',
+      currency: 'A0GI',
+      type: 'AI_OPTIMIZED' as const,
+      specialization: 'DATA_AI_LAYER',
+      features: ['data_availability', 'ai_optimization', 'decentralized_storage'],
+      privateKey: process.env.ZEROG_PRIVATE_KEY || '',
+      storageApi: process.env.ZEROG_STORAGE_API || '',
+      contracts: {
+        bridge: process.env.ZEROG_BRIDGE_CONTRACT || '',
+        pump: process.env.ZEROG_PUMP_CONTRACT || '',
+      },
     },
     somnia: {
       chainId: 50312,
-      name: 'Somnia Testnet',
-      rpc: envVars.SOMNIA_RPC_URL,
-      ws: envVars.SOMNIA_WS_URL,
-      explorer: 'https://shannon-explorer.somnia.network/',
-      currency: { symbol: 'STT', decimals: 18 },
-      role: 'GAMING_LAYER',
-      features: ['quest_management', 'nft_rewards', 'gaming_mechanics', 'achievement_system']
+      name: 'Somnia Shannon Testnet',
+      rpc: process.env.SOMNIA_RPC_URL || 'https://vsf-rpc.somnia.network',
+      explorer: 'https://shannon-explorer.somnia.network',
+      faucet: 'https://testnet.somnia.network',
+      currency: 'STT',
+      type: 'GAMING_OPTIMIZED' as const,
+      specialization: 'GAMING_METAVERSE',
+      features: ['icedb', 'multistream_consensus', 'reactive_primitives'],
+      privateKey: process.env.SOMNIA_PRIVATE_KEY || '',
+      icedbConfig: process.env.SOMNIA_ICEDB_CONFIG || '',
+      contracts: {
+        bridge: process.env.SOMNIA_BRIDGE_CONTRACT || '',
+        pump: process.env.SOMNIA_PUMP_CONTRACT || '',
+      },
     },
-    sepolia: {
-      chainId: 11155111,
-      name: 'Sepolia Testnet',
-      rpc: envVars.SEPOLIA_RPC_URL,
-      ws: envVars.SEPOLIA_WS_URL,
-      explorer: 'https://sepolia.etherscan.io/',
-      currency: { symbol: 'ETH', decimals: 18 },
-      role: 'BRIDGE_HUB',
-      features: ['cross_chain_bridge', 'multi_chain_support', 'evm_compatibility', 'stable_testnet']
-    }
   },
-  contracts: {
-    risechain: {
-      scryptexFactory: envVars.RISECHAIN_SCRYPTEX_FACTORY,
-      tokenFactory: envVars.RISECHAIN_TOKEN_FACTORY,
-      scryptexDex: envVars.RISECHAIN_SCRYPTEX_DEX,
-      liquidityManager: envVars.RISECHAIN_LIQUIDITY_MANAGER,
-      crossChainCoordinator: envVars.RISECHAIN_CROSS_CHAIN_COORDINATOR
-    },
-    abstract: {
-      communityManager: envVars.ABSTRACT_COMMUNITY_MANAGER,
-      governanceVoting: envVars.ABSTRACT_GOVERNANCE_VOTING,
-      reputationSystem: envVars.ABSTRACT_REPUTATION_SYSTEM,
-      crossChainCoordinator: envVars.ABSTRACT_CROSS_CHAIN_COORDINATOR
-    },
-    og: {
-      activityTracker: envVars.OG_ACTIVITY_TRACKER,
-      metricsCollector: envVars.OG_METRICS_COLLECTOR,
-      farmingCalculator: envVars.OG_FARMING_CALCULATOR,
-      crossChainCoordinator: envVars.OG_CROSS_CHAIN_COORDINATOR
-    },
-    somnia: {
-      questManager: envVars.SOMNIA_QUEST_MANAGER,
-      achievementNft: envVars.SOMNIA_ACHIEVEMENT_NFT,
-      rewardDistributor: envVars.SOMNIA_REWARD_DISTRIBUTOR,
-      crossChainCoordinator: envVars.SOMNIA_CROSS_CHAIN_COORDINATOR
-    },
-    sepolia: {
-      bridgeContract: envVars.SEPOLIA_BRIDGE_CONTRACT,
-      crossChainCoordinator: envVars.SEPOLIA_CROSS_CHAIN_COORDINATOR
-    }
-  },
-  platformWallets: {
-    risechain: {
-      platform1: envVars.RISECHAIN_PLATFORM_1_PRIVATE_KEY,
-      platform2: envVars.RISECHAIN_PLATFORM_2_PRIVATE_KEY
-    },
-    abstract: {
-      platform1: envVars.ABSTRACT_PLATFORM_1_PRIVATE_KEY,
-      platform2: envVars.ABSTRACT_PLATFORM_2_PRIVATE_KEY
-    },
-    og: {
-      platform1: envVars.OG_PLATFORM_1_PRIVATE_KEY,
-      platform2: envVars.OG_PLATFORM_2_PRIVATE_KEY
-    },
-    somnia: {
-      platform1: envVars.SOMNIA_PLATFORM_1_PRIVATE_KEY,
-      platform2: envVars.SOMNIA_PLATFORM_2_PRIVATE_KEY
-    },
-    sepolia: {
-      platform1: envVars.SEPOLIA_PLATFORM_1_PRIVATE_KEY,
-      platform2: envVars.SEPOLIA_PLATFORM_2_PRIVATE_KEY
-    }
-  },
-  features: {
-    websockets: envVars.ENABLE_WEBSOCKETS,
-    backgroundJobs: envVars.ENABLE_BACKGROUND_JOBS,
-    analyticsTracking: envVars.ENABLE_ANALYTICS_TRACKING,
-    farmingAutomation: envVars.ENABLE_FARMING_AUTOMATION,
-    socialFeatures: envVars.ENABLE_SOCIAL_FEATURES,
-    gamingFeatures: envVars.ENABLE_GAMING_FEATURES
-  },
-  externalServices: {
-    sentry: {
-      dsn: envVars.SENTRY_DSN
-    },
-    discord: {
-      webhookUrl: envVars.DISCORD_WEBHOOK_URL
-    },
-    telegram: {
-      botToken: envVars.TELEGRAM_BOT_TOKEN,
-      chatId: envVars.TELEGRAM_CHAT_ID
-    }
-  },
-  performance: {
-    rateLimit: {
-      windowMs: envVars.RATE_LIMIT_WINDOW_MS,
-      maxRequests: envVars.RATE_LIMIT_MAX_REQUESTS
-    },
-    cache: {
-      ttlSeconds: envVars.CACHE_TTL_SECONDS
-    },
-    blockchain: {
-      maxConcurrentCalls: envVars.MAX_CONCURRENT_BLOCKCHAIN_CALLS,
-      timeoutMs: envVars.BLOCKCHAIN_TIMEOUT_MS
-    }
-  },
-  logging: {
-    level: envVars.LOG_LEVEL,
-    console: envVars.LOG_CONSOLE_ENABLED,
-    file: envVars.LOG_FILE_ENABLED,
-    database: envVars.LOG_DB_ENABLED
-  }
 };
 
-// Log configuration summary
-logger.info('Configuration loaded:', {
-  environment: config.env,
-  server: `${config.server.port}`,
-  database: config.database.name,
-  redis: `${config.redis.host}:${config.redis.port}`,
-  features: config.features,
-  chains: Object.keys(config.blockchain)
-});
+export default config;
