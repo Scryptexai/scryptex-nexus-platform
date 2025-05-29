@@ -1,0 +1,224 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 0.5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-feature-settings: "rlig" 1, "calt" 1;
+  overflow-x: hidden;
+}
+
+/* Admin-specific styles */
+.admin-gradient {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.admin-card {
+  @apply bg-card border border-border rounded-lg shadow-admin;
+}
+
+.admin-button {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+}
+
+.admin-input {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.admin-table {
+  @apply w-full border-collapse bg-card rounded-lg overflow-hidden;
+}
+
+.admin-table th {
+  @apply border-b border-border px-4 py-3 text-left text-sm font-medium text-muted-foreground;
+}
+
+.admin-table td {
+  @apply border-b border-border px-4 py-3 text-sm;
+}
+
+.admin-table tr:hover {
+  @apply bg-muted/50;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Loading animations */
+.loading-pulse {
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-spinner {
+  animation: loading-spinner 1s linear infinite;
+}
+
+@keyframes loading-spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Status indicators */
+.status-healthy {
+  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+}
+
+.status-warning {
+  @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+}
+
+.status-critical {
+  @apply bg-red-500/20 text-red-400 border border-red-500/30;
+}
+
+.status-unknown {
+  @apply bg-gray-500/20 text-gray-400 border border-gray-500/30;
+}
+
+/* Alert styles */
+.alert {
+  @apply relative w-full rounded-lg border p-4;
+}
+
+.alert-info {
+  @apply border-blue-500/30 bg-blue-500/10 text-blue-400;
+}
+
+.alert-success {
+  @apply border-green-500/30 bg-green-500/10 text-green-400;
+}
+
+.alert-warning {
+  @apply border-yellow-500/30 bg-yellow-500/10 text-yellow-400;
+}
+
+.alert-error {
+  @apply border-red-500/30 bg-red-500/10 text-red-400;
+}
+
+/* Chart container */
+.chart-container {
+  @apply w-full h-full;
+}
+
+.chart-container .recharts-wrapper {
+  @apply w-full h-full;
+}
+
+/* Security highlight */
+.security-highlight {
+  @apply relative;
+}
+
+.security-highlight::before {
+  content: '';
+  @apply absolute -inset-1 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg blur opacity-75;
+}
+
+.security-highlight > * {
+  @apply relative;
+}
+
+/* Emergency button */
+.emergency-button {
+  @apply bg-red-600 hover:bg-red-700 text-white font-semibold;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Utility classes */
+.text-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.truncate-address {
+  @apply font-mono text-sm;
+}
+
+.truncate-hash {
+  @apply font-mono text-xs text-muted-foreground;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .admin-table {
+    @apply text-xs;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    @apply px-2 py-2;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .admin-card {
+    @apply border-2;
+  }
+  
+  .admin-button {
+    @apply border-2;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
