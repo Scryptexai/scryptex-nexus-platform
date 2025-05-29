@@ -46,6 +46,45 @@ const envSchema = Joi.object({
   OG_WS_URL: Joi.string().uri().optional(),
   SOMNIA_RPC_URL: Joi.string().uri().required(),
   SOMNIA_WS_URL: Joi.string().uri().optional(),
+  SEPOLIA_RPC_URL: Joi.string().uri().required(),
+  SEPOLIA_WS_URL: Joi.string().uri().optional(),
+
+  // Contract addresses
+  RISECHAIN_SCRYPTEX_FACTORY: Joi.string().optional(),
+  RISECHAIN_TOKEN_FACTORY: Joi.string().optional(),
+  RISECHAIN_SCRYPTEX_DEX: Joi.string().optional(),
+  RISECHAIN_LIQUIDITY_MANAGER: Joi.string().optional(),
+  RISECHAIN_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
+  
+  ABSTRACT_COMMUNITY_MANAGER: Joi.string().optional(),
+  ABSTRACT_GOVERNANCE_VOTING: Joi.string().optional(),
+  ABSTRACT_REPUTATION_SYSTEM: Joi.string().optional(),
+  ABSTRACT_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
+  
+  OG_ACTIVITY_TRACKER: Joi.string().optional(),
+  OG_METRICS_COLLECTOR: Joi.string().optional(),
+  OG_FARMING_CALCULATOR: Joi.string().optional(),
+  OG_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
+  
+  SOMNIA_QUEST_MANAGER: Joi.string().optional(),
+  SOMNIA_ACHIEVEMENT_NFT: Joi.string().optional(),
+  SOMNIA_REWARD_DISTRIBUTOR: Joi.string().optional(),
+  SOMNIA_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
+
+  SEPOLIA_BRIDGE_CONTRACT: Joi.string().optional(),
+  SEPOLIA_CROSS_CHAIN_COORDINATOR: Joi.string().optional(),
+
+  // Platform wallet private keys
+  RISECHAIN_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
+  RISECHAIN_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
+  ABSTRACT_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
+  ABSTRACT_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
+  OG_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
+  OG_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
+  SOMNIA_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
+  SOMNIA_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
+  SEPOLIA_PLATFORM_1_PRIVATE_KEY: Joi.string().optional(),
+  SEPOLIA_PLATFORM_2_PRIVATE_KEY: Joi.string().optional(),
 
   // Feature flags
   ENABLE_WEBSOCKETS: Joi.boolean().default(true),
@@ -166,6 +205,16 @@ export const config = {
       currency: { symbol: 'STT', decimals: 18 },
       role: 'GAMING_LAYER',
       features: ['quest_management', 'nft_rewards', 'gaming_mechanics', 'achievement_system']
+    },
+    sepolia: {
+      chainId: 11155111,
+      name: 'Sepolia Testnet',
+      rpc: envVars.SEPOLIA_RPC_URL,
+      ws: envVars.SEPOLIA_WS_URL,
+      explorer: 'https://sepolia.etherscan.io/',
+      currency: { symbol: 'ETH', decimals: 18 },
+      role: 'BRIDGE_HUB',
+      features: ['cross_chain_bridge', 'multi_chain_support', 'evm_compatibility', 'stable_testnet']
     }
   },
   contracts: {
@@ -193,6 +242,10 @@ export const config = {
       achievementNft: envVars.SOMNIA_ACHIEVEMENT_NFT,
       rewardDistributor: envVars.SOMNIA_REWARD_DISTRIBUTOR,
       crossChainCoordinator: envVars.SOMNIA_CROSS_CHAIN_COORDINATOR
+    },
+    sepolia: {
+      bridgeContract: envVars.SEPOLIA_BRIDGE_CONTRACT,
+      crossChainCoordinator: envVars.SEPOLIA_CROSS_CHAIN_COORDINATOR
     }
   },
   platformWallets: {
@@ -211,6 +264,10 @@ export const config = {
     somnia: {
       platform1: envVars.SOMNIA_PLATFORM_1_PRIVATE_KEY,
       platform2: envVars.SOMNIA_PLATFORM_2_PRIVATE_KEY
+    },
+    sepolia: {
+      platform1: envVars.SEPOLIA_PLATFORM_1_PRIVATE_KEY,
+      platform2: envVars.SEPOLIA_PLATFORM_2_PRIVATE_KEY
     }
   },
   features: {
