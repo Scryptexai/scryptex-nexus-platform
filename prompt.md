@@ -1,442 +1,615 @@
-I want you to generate a complete Node.js TypeScript backend platform based on the detail specification I provided below. 
+Next step building and depelopment this platform 
 
-Focus on:
-1. Generates all the necessary code according to the file structure
-2. Complete implementation for 4 chains (RiseChain, Abstract, 0g, Somnia)  
-3. Functional bridge, swap, quest, and gaming systems
-4. Production-ready code with complete error handling
-5. Don't execute, just generate code
-6. create a separate folder from the frontend structure 
+Step 2 Backend Infrastruktur
 
-📋 PROJECT OVERVIEW**
+Generate script code backend this is with EVN EXAMPLE , 
 
-Create a comprehensive **Node.js TypeScript backend platform** for SCRYPTEX - the first cross-chain bridge and transaction platform for new testnet ecosystems. Focus on **blockchain transactions, quest systems, and gaming mechanics**.
+1. wallet conect 
+generate backend script code and save user address data into mongodb 
+2. blockchain intregrasiton for now only risechain SDK former, 
+3. referrall system dan point system save data point to mongodb
 
-## **⛓️ TARGET CHAINS CONFIGURATION**
 
-### **Chain Network Details:**
-```typescript
-// EXACT chain configurations from research
-const CHAIN_CONFIGS = {
-  risechain: {
-    chainId: 11155931,
-    name: "RiseChain Testnet", 
-    rpc: "https://testnet.riselabs.xyz",
-    websocket: "wss://testnet.riselabs.xyz/ws",
-    explorer: "https://explorer.testnet.riselabs.xyz",
-    faucet: "https://faucet.testnet.riselabs.xyz",
-    currency: "ETH",
-    specialization: "ULTRA_FAST_TRADING", // 10ms blocks, 50K TPS
-    features: ["shreds", "parallel_execution", "gigagas"]
-  },
-  abstract: {
-    chainId: 11124, // Testnet
-    name: "Abstract Testnet",
-    rpc: "https://api.testnet.abs.xyz", 
-    websocket: "wss://api.testnet.abs.xyz/ws",
-    explorer: "https://sepolia.abscan.org",
-    currency: "ETH",
-    specialization: "SOCIAL_CONSUMER_APPS", // AGW integration
-    features: ["agw_wallet", "zk_stack", "social_primitives"]
-  },
-  zerog: {
-    chainId: 16601, // Galileo testnet
-    name: "0G Galileo Testnet",
-    rpc: "https://evmrpc-testnet.0g.ai",
-    explorer: "https://chainscan-galileo.0g.ai", 
-    faucet: "https://faucet.0g.ai",
-    currency: "A0GI",
-    specialization: "DATA_AI_LAYER", // 2GB/s storage, AI optimization
-    features: ["data_availability", "ai_optimization", "decentralized_storage"]
-  },
-  somnia: {
-    chainId: 50312, // Shannon testnet
-    name: "Somnia Shannon Testnet",
-    rpc: "https://vsf-rpc.somnia.network", 
-    explorer: "https://shannon-explorer.somnia.network",
-    faucet: "https://testnet.somnia.network",
-    currency: "STT",
-    specialization: "GAMING_METAVERSE", // 1M+ TPS, gaming focus
-    features: ["icedb", "multistream_consensus", "reactive_primitives"]
-  }
-};
-```
-
-## **🏗️ REQUIRED BACKEND ARCHITECTURE**
-
-### **File Structure:**
-```
-scryptex-backend/
-├── src/
-│   ├── chains/              # Chain-specific implementations
-│   │   ├── base/
-│   │   │   ├── EVMChainService.ts
-│   │   │   ├── TransactionHandler.ts
-│   │   │   └── BridgeController.ts
-│   │   ├── risechain/
-│   │   │   ├── RiseChainService.ts
-│   │   │   └── ShredsMonitor.ts
-│   │   ├── abstract/
-│   │   │   ├── AbstractService.ts
-│   │   │   └── AGWIntegration.ts
-│   │   ├── zerog/
-│   │   │   ├── ZeroGService.ts
-│   │   │   └── DataAvailability.ts
-│   │   └── somnia/
-│   │       ├── SomniaService.ts
-│   │       └── IceDBConnector.ts
-│   ├── controllers/         # API controllers
-│   │   ├── BridgeController.ts
-│   │   ├── SwapController.ts
-│   │   ├── QuestController.ts
-│   │   └── GameController.ts
-│   ├── services/           # Business logic
-│   │   ├── BridgeService.ts
-│   │   ├── SwapService.ts
-│   │   ├── QuestService.ts
-│   │   ├── GameService.ts
-│   │   └── TransactionService.ts
-│   ├── models/             # Data models
-│   │   ├── Transaction.ts
-│   │   ├── Bridge.ts
-│   │   ├── Quest.ts
-│   │   └── User.ts
-│   ├── routes/             # API routes
-│   │   ├── bridge.ts
-│   │   ├── swap.ts
-│   │   ├── quest.ts
-│   │   └── game.ts
-│   ├── middleware/         # Custom middleware
-│   │   ├── auth.ts
-│   │   ├── validation.ts
-│   │   └── errorHandler.ts
-│   ├── utils/              # Utilities
-│   │   ├── web3Utils.ts
-│   │   ├── chainUtils.ts
-│   │   └── cryptoUtils.ts
-│   ├── config/             # Configuration
-│   │   ├── chains.ts
-│   │   ├── database.ts
-│   │   └── environment.ts
-│   └── app.ts              # Main application
-├── contracts/              # Smart contract interfaces
-│   ├── Bridge.sol
-│   ├── QuestNFT.sol
-│   └── GameToken.sol
-├── deploy/                 # Deployment scripts
-│   ├── deployBridge.ts
-│   ├── deployQuests.ts
-│   └── setupChains.ts
-├── tests/                  # Test files
-├── package.json
-├── tsconfig.json
-├── .env.example
-└── README.md
-```
-
-## **🔧 CORE FUNCTIONALITY REQUIREMENTS**
-
-### **1. Multi-Chain Bridge System:**
-```typescript
-interface BridgeTransaction {
-  fromChain: ChainId;
-  toChain: ChainId;
-  fromAddress: string;
-  toAddress: string;
-  amount: string;
-  token: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  txHash: string;
-  bridgeFee: string;
-}
-
-// Required endpoints:
-// POST /api/bridge/quote - Get bridge quote
-// POST /api/bridge/execute - Execute bridge transaction  
-// GET /api/bridge/status/:txId - Check bridge status
-// GET /api/bridge/history/:address - Get bridge history
-```
-
-### **2. Multi-Chain Swap System:**
-```typescript
-interface SwapTransaction {
-  chainId: ChainId;
-  fromToken: string;
-  toToken: string;
-  amount: string;
-  slippage: number;
-  deadline: number;
-  recipient: string;
-  status: TransactionStatus;
-}
-
-// Required endpoints:
-// POST /api/swap/quote - Get swap quote
-// POST /api/swap/execute - Execute swap
-// GET /api/swap/history/:address - Swap history
-```
-
-### **3. Quest & Gaming System:**
-```typescript
-interface Quest {
-  id: string;
-  title: string;
-  description: string;
-  chainId: ChainId;
-  requirements: QuestRequirement[];
-  rewards: QuestReward[];
-  status: 'active' | 'completed' | 'expired';
-  progress: number;
-}
-
-interface QuestRequirement {
-  type: 'bridge' | 'swap' | 'deploy' | 'transaction';
-  target: any;
-  completed: boolean;
-}
-
-// Required endpoints:
-// GET /api/quests - Get available quests
-// POST /api/quests/:id/claim - Claim quest reward
-// GET /api/quests/progress/:address - Get user progress
-```
-
-### **4. Transaction Deployment System:**
-```typescript
-interface DeployTransaction {
-  chainId: ChainId;
-  contractType: 'token' | 'nft' | 'bridge' | 'custom';
-  bytecode: string;
-  constructor: any[];
-  deployer: string;
-  status: TransactionStatus;
-}
-
-// Required endpoints:
-// POST /api/deploy/contract - Deploy contract
-// GET /api/deploy/status/:txId - Check deployment
-// GET /api/deploy/history/:address - Deployment history
-```
-
-## **📦 REQUIRED DEPENDENCIES**
-
-### **Core Dependencies:**
-```json
-{
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5", 
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0",
-    "dotenv": "^16.3.1",
-    "ethers": "^6.8.1",
-    "web3": "^4.2.2",
-    "@abstract-foundation/agw-client": "latest",
-    "@abstract-foundation/agw-react": "latest",
-    "redis": "^4.6.10",
-    "pg": "^8.11.3",
-    "typeorm": "^0.3.17",
-    "winston": "^3.11.0",
-    "joi": "^17.11.0",
-    "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
-    "axios": "^1.6.0",
-    "ws": "^8.14.2"
-  },
-  "devDependencies": {
-    "@types/node": "^20.8.9",
-    "@types/express": "^4.17.20",
-    "typescript": "^5.2.2", 
-    "ts-node": "^10.9.1",
-    "nodemon": "^3.0.1",
-    "jest": "^29.7.0",
-    "@types/jest": "^29.5.6"
-  }
-}
-```
-
-## **🔐 ENVIRONMENT CONFIGURATION**
-
-### **Required .env.example:**
-```env
-# Server Configuration
-NODE_ENV=development
-PORT=3000
-API_VERSION=v1
-
-# Database Configuration  
-DATABASE_URL=postgresql://username:password@localhost:5432/scryptex
-REDIS_URL=redis://localhost:6379
-
-# RiseChain Configuration
-RISECHAIN_RPC_URL=https://testnet.riselabs.xyz
-RISECHAIN_WS_URL=wss://testnet.riselabs.xyz/ws
-RISECHAIN_PRIVATE_KEY=your_private_key_here
-RISECHAIN_BRIDGE_CONTRACT=0x...
-
-# Abstract Configuration
-ABSTRACT_RPC_URL=https://api.testnet.abs.xyz
-ABSTRACT_WS_URL=wss://api.testnet.abs.xyz/ws
-ABSTRACT_PRIVATE_KEY=your_private_key_here
-ABSTRACT_AGW_CONFIG=your_agw_config_here
-ABSTRACT_BRIDGE_CONTRACT=0x...
-
-# 0G Configuration
-ZEROG_RPC_URL=https://evmrpc-testnet.0g.ai
-ZEROG_PRIVATE_KEY=your_private_key_here
-ZEROG_STORAGE_API=your_storage_api_key
-ZEROG_BRIDGE_CONTRACT=0x...
-
-# Somnia Configuration
-SOMNIA_RPC_URL=https://vsf-rpc.somnia.network
-SOMNIA_PRIVATE_KEY=your_private_key_here
-SOMNIA_ICEDB_CONFIG=your_icedb_config
-SOMNIA_BRIDGE_CONTRACT=0x...
-
-# Security
-JWT_SECRET=your_super_secret_jwt_key
-BRIDGE_FEE_PERCENTAGE=0.1
-ENCRYPTION_KEY=your_encryption_key
-
-# External APIs
-COINGECKO_API_KEY=your_coingecko_key
-DEFILLAMA_API_KEY=your_defillama_key
-
-# Monitoring
-SENTRY_DSN=your_sentry_dsn
-LOG_LEVEL=info
-```
-
-## **🎯 SPECIFIC IMPLEMENTATION REQUIREMENTS**
-
-### **1. Chain-Specific Service Implementations:**
-
-**RiseChain Service Requirements:**
-- Implement Shreds monitoring for 10ms block confirmation
-- Optimize for Gigagas calculation and parallel execution
-- Custom gas estimation for ultra-fast transactions
-
-**Abstract Service Requirements:**
-- Integrate Abstract Global Wallet (AGW) SDK
-- Support social primitives and consumer app features  
-- Handle zkSync ZK stack specific transactions
-
-**0G Service Requirements:**
-- Implement data availability layer integration
-- Support AI model storage and retrieval (2GB/s)
-- Custom analytics and data processing APIs
-
-**Somnia Service Requirements:**
-- Integrate IceDB for ultra-fast state queries (15-100ns)
-- Implement reactive primitives for real-time events
-- Gaming-optimized transaction handling (1M+ TPS)
-
-### **2. Bridge Logic Requirements:**
-- Cross-chain state synchronization
-- Atomic bridge transactions with rollback
-- Fee calculation based on chain gas costs
-- Bridge transaction monitoring and confirmations
-- Failed transaction recovery mechanisms
-
-### **3. Quest System Requirements:**
-- Dynamic quest generation based on chain activity
-- NFT reward minting across chains
-- Progress tracking and validation
-- Leaderboard and scoring system
-- Social sharing and referral bonuses
-
-### **4. Gaming Integration Requirements:**
-- Real-time transaction notifications via WebSocket
-- Achievement system with on-chain verification
-- Multi-chain tournament support
-- Gaming token economics and rewards
-- Reactive game state updates
-
-## **🔍 SPECIFIC CODE GENERATION INSTRUCTIONS**
-
-### **Generate Complete Implementation For:**
-
-1. **EVMChainService Base Class** - Abstract class with common EVM functionality
-2. **Chain-Specific Services** - Four complete implementations with optimizations
-3. **Bridge Controller & Service** - Full cross-chain bridge logic
-4. **Quest System** - Complete quest generation and tracking
-5. **Transaction Handlers** - Swap, deploy, and bridge transaction processing
-6. **API Routes** - All REST endpoints with validation
-7. **Database Models** - TypeORM entities for all data structures
-8. **Deployment Scripts** - Contract deployment to all testnets
-9. **Error Handling** - Comprehensive error management
-10. **Testing Framework** - Jest tests for critical functions
-
-### **Implementation Style:**
-- Use **TypeScript strict mode**
-- Implement **comprehensive error handling**
-- Add **detailed logging** with Winston
-- Include **input validation** with Joi
-- Use **async/await** pattern throughout
-- Implement **retry mechanisms** for blockchain calls
-- Add **rate limiting** for API endpoints
-- Include **comprehensive TypeScript interfaces**
-- Use **modular architecture** with dependency injection
-- Implement **caching strategies** with Redis
-
-### **Special Requirements:**
-- All blockchain calls should have **timeout handling**
-- Implement **transaction nonce management**
-- Add **gas price optimization** strategies
-- Include **WebSocket real-time updates**
-- Support **batch operations** for efficiency
-- Implement **circuit breakers** for external APIs
-- Add **comprehensive monitoring** and metrics
-- Include **data encryption** for sensitive information
-
-## **🎮 QUEST & GAMING FEATURES**
-
-### **Quest Types to Implement:**
-```typescript
-enum QuestType {
-  FIRST_BRIDGE = "first_bridge",           // Complete first bridge transaction
-  CHAIN_EXPLORER = "chain_explorer",       // Bridge to all 4 chains
-  VOLUME_TRADER = "volume_trader",         // Bridge $1000+ volume
-  SPEED_RUNNER = "speed_runner",           // Complete 10 bridges in 1 hour
-  MULTI_TOKEN = "multi_token",             // Bridge 5 different tokens
-  SOCIAL_BRIDGER = "social_bridger",       // Refer 3 friends
-  DAILY_BRIDGER = "daily_bridger",         // Bridge daily for 7 days
-  WHALE_BRIDGER = "whale_bridger",         // Single bridge $10,000+
-  CHAIN_MASTER = "chain_master",           // Master one specific chain
-  BRIDGE_PIONEER = "bridge_pioneer"        // Early platform user
-}
-```
-
-### **Gaming Mechanics:**
-- **XP System**: Earn experience points for each transaction
-- **Levels**: User progression with unlockable features
-- **Achievements**: On-chain achievement NFTs
-- **Leaderboards**: Daily/weekly/monthly top bridgers  
-- **Tournaments**: Competitive bridge challenges
-- **Referral System**: Invite friends for bonus rewards
-
-## **🚀 DEPLOYMENT REQUIREMENTS**
-
-### **Generate Deployment Scripts For:**
-1. **Docker Configuration** - Multi-container setup
-2. **Database Migration** - Schema setup and seeding
-3. **Contract Deployment** - Deploy to all 4 testnets
-4. **Environment Setup** - Development/staging/production configs
-5. **Monitoring Setup** - Health checks and alerts
-6. **Load Balancer Config** - High availability setup
+Rise Chain blockchain** for a token creation and trading platform similar to pump.fun. The backend should handle bonding curve tokens, DEX swaps, and cross-chain bridging between Sepolia and Rise Chain.
 
 ---
 
-**Generate the complete, production-ready backend codebase following all these specifications. Focus on creating robust, scalable, and maintainable code that leverages the unique features of each blockchain while providing a unified API interface for the frontend.**
+## 📋 Core Requirements
 
-**The codebase should be immediately deployable to development environment and ready for testnet integration across all 4 target chains.**
+### **Technology Stack**
+- **Backend**: Node.js + Express.js + TypeScript
+- **Database**: PostgreSQL with prisma ORM
+- **Blockchain**: ethers.js for blockchain interactions
+- **Authentication**: JWT tokens
+- **Real-time**: Socket.io for live price updates
+- **Queue**: Bull/BullMQ for background jobs
+- **Caching**: Redis for performance
+- **API Documentation**: Swagger/OpenAPI
 
-All the files, starting from the:
-1. Package.json and tsconfig.json
-2. Environment configuration 
-3. Chain services implementation
-4. Controllers and routes
-5. Models and database setup
-6. Deployment scripts
+### **Blockchain Configuration**
+```typescript
+// Rise Chain Testnet Configuration
+const RISE_CHAIN_CONFIG = {
+  chainId: 11155931,
+  rpcUrl: "https://testnet.riselabs.xyz",
+  websocket: "wss://testnet.riselabs.xyz/ws",
+  explorer: "https://explorer.testnet.riselabs.xyz",
+  faucet: "https://faucet.testnet.riselabs.xyz",
 
-Provide complete code for each file required.
+}
+
+// Sepolia Configuration for bridging
+const SEPOLIA_CONFIG = {
+  chainId: 11155111,
+  rpcUrl: "https://sepolia.infura.io/v3/YOUR_KEY",
+  explorer: "https://sepolia.etherscan.io"
+}
+```
+
+---
+
+## 🏗️ Backend Architecture
+
+### **1. Project Structure**
+```
+src/
+├── controllers/          # API route handlers
+├── services/            # Business logic layer
+├── models/              # Database models (Prisma)
+├── middleware/          # Authentication, validation, etc.
+├── utils/               # Utility functions
+├── blockchain/          # Blockchain interaction layer
+├── jobs/                # Background job processors
+├── websocket/           # Socket.io handlers
+├── config/              # Configuration files
+└── types/               # TypeScript type definitions
+```
+
+### **2. Database Schema (Prisma)**
+```prisma
+// Users and authentication
+model User {
+  id          String   @id @default(cuid())
+  walletAddress String @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  tokens      Token[]
+  transactions Transaction[]
+  bridgeRequests BridgeRequest[]
+}
+
+// Token management
+model Token {
+  id              String   @id @default(cuid())
+  contractAddress String   @unique
+  name            String
+  symbol          String
+  creator         String   // User wallet address
+  chainId         Int      @default(11155931)
+  
+  // Bonding curve data
+  currentSupply   Decimal  @default(0)
+  reserveBalance  Decimal  @default(0)
+  currentPrice    Decimal  @default(0)
+  marketCap       Decimal  @default(0)
+  graduated       Boolean  @default(false)
+  graduatedAt     DateTime?
+  
+  // Metadata
+  description     String?
+  imageUrl        String?
+  website         String?
+  telegram        String?
+  twitter         String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  creator_user    User     @relation(fields: [creator], references: [walletAddress])
+  transactions    Transaction[]
+  priceHistory    PriceHistory[]
+}
+
+// Transaction tracking
+model Transaction {
+  id              String   @id @default(cuid())
+  txHash          String   @unique
+  blockNumber     Int
+  tokenAddress    String
+  userAddress     String
+  type            TransactionType
+  
+  // Amount data
+  ethAmount       Decimal?
+  tokenAmount     Decimal?
+  pricePerToken   Decimal?
+  gasFee          Decimal?
+  
+  // Status
+  status          TransactionStatus @default(PENDING)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  token           Token    @relation(fields: [tokenAddress], references: [contractAddress])
+  user            User     @relation(fields: [userAddress], references: [walletAddress])
+}
+
+// Price history for charts
+model PriceHistory {
+  id              String   @id @default(cuid())
+  tokenAddress    String
+  price           Decimal
+  volume24h       Decimal  @default(0)
+  marketCap       Decimal
+  timestamp       DateTime @default(now())
+  
+  // Relations
+  token           Token    @relation(fields: [tokenAddress], references: [contractAddress])
+}
+
+// Bridge transactions
+model BridgeRequest {
+  id              String   @id @default(cuid())
+  userAddress     String
+  sourceChain     Int      // Chain ID
+  targetChain     Int      // Chain ID
+  amount          Decimal
+  status          BridgeStatus @default(PENDING)
+  
+  // Transaction hashes
+  sourceTxHash    String?
+  targetTxHash    String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  user            User     @relation(fields: [userAddress], references: [walletAddress])
+}
+
+// Enums
+enum TransactionType {
+  BUY
+  SELL
+  CREATE
+  TRANSFER
+  BRIDGE
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum BridgeStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+```
+
+---
+
+## 🔗 API Endpoints
+
+### **Authentication Endpoints**
+```typescript
+// POST /api/auth/connect
+// Connect wallet and get JWT token
+interface ConnectWalletRequest {
+  walletAddress: string;
+  signature: string;
+  message: string;
+}
+
+// POST /api/auth/verify
+// Verify JWT token
+```
+
+### **Token Management Endpoints**
+```typescript
+// POST /api/tokens/create
+// Create new bonding curve token
+interface CreateTokenRequest {
+  name: string;
+  symbol: string;
+  description?: string;
+  imageUrl?: string;
+  website?: string;
+  telegram?: string;
+  twitter?: string;
+}
+
+// GET /api/tokens
+// Get all tokens with pagination and filters
+interface GetTokensQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'created' | 'marketCap' | 'volume';
+  orderBy?: 'asc' | 'desc';
+  graduated?: boolean;
+}
+
+// GET /api/tokens/:address
+// Get token details by contract address
+
+// GET /api/tokens/:address/chart
+// Get price history for charts
+interface ChartQuery {
+  timeframe?: '1h' | '24h' | '7d' | '30d';
+  resolution?: number; // minutes
+}
+
+// GET /api/tokens/:address/transactions
+// Get token transaction history
+```
+
+### **Trading Endpoints**
+```typescript
+// POST /api/trading/buy
+// Buy tokens using bonding curve
+interface BuyTokenRequest {
+  tokenAddress: string;
+  ethAmount: string;
+  slippage?: number; // percentage
+}
+
+// POST /api/trading/sell
+// Sell tokens using bonding curve
+interface SellTokenRequest {
+  tokenAddress: string;
+  tokenAmount: string;
+  slippage?: number;
+}
+
+// POST /api/trading/quote
+// Get price quote for buy/sell
+interface QuoteRequest {
+  tokenAddress: string;
+  type: 'buy' | 'sell';
+  amount: string; // ETH for buy, tokens for sell
+}
+
+// GET /api/trading/portfolio/:address
+// Get user's token portfolio
+```
+
+### **Bridge Endpoints**
+```typescript
+// POST /api/bridge/deposit
+// Initiate bridge from Sepolia to Rise Chain
+interface BridgeDepositRequest {
+  amount: string;
+  targetAddress?: string;
+}
+
+// POST /api/bridge/withdraw
+// Initiate bridge from Rise Chain to Sepolia
+interface BridgeWithdrawRequest {
+  amount: string;
+  targetAddress?: string;
+}
+
+// GET /api/bridge/status/:id
+// Get bridge transaction status
+
+// GET /api/bridge/history/:address
+// Get user's bridge history
+```
+
+### **Analytics Endpoints**
+```typescript
+// GET /api/analytics/overview
+// Platform overview stats
+interface OverviewStats {
+  totalTokens: number;
+  totalVolume24h: string;
+  totalUsers: number;
+  graduatedTokens: number;
+}
+
+// GET /api/analytics/trending
+// Get trending tokens
+
+// GET /api/analytics/top-creators
+// Get top token creators
+```
+
+---
+
+## ⚙️ Blockchain Integration Layer
+
+### **Smart Contract Interaction Service**
+```typescript
+// src/blockchain/contracts.ts
+export class ContractService {
+  private riseProvider: ethers.Provider;
+  private sepoliaProvider: ethers.Provider;
+  private wallet: ethers.Wallet;
+  
+  // Token Factory interactions
+  async createToken(name: string, symbol: string): Promise<string>;
+  async getTokenDetails(address: string): Promise<TokenDetails>;
+  
+  // Bonding Curve interactions
+  async buyTokens(tokenAddress: string, ethAmount: string): Promise<string>;
+  async sellTokens(tokenAddress: string, tokenAmount: string): Promise<string>;
+  async getTokenPrice(tokenAddress: string): Promise<string>;
+  async calculateBuyReturn(tokenAddress: string, ethAmount: string): Promise<string>;
+  async calculateSellReturn(tokenAddress: string, tokenAmount: string): Promise<string>;
+  
+  // Bridge interactions
+  async bridgeToRise(amount: string): Promise<string>;
+  async bridgeToSepolia(amount: string, signature: string): Promise<string>;
+  
+  // Event listening
+  async setupEventListeners(): Promise<void>;
+}
+```
+
+### **Event Monitoring Service**
+```typescript
+// src/blockchain/events.ts
+export class EventMonitorService {
+  // Monitor token creation events
+  async monitorTokenCreation(): Promise<void>;
+  
+  // Monitor buy/sell transactions
+  async monitorTrading(): Promise<void>;
+  
+  // Monitor bridge events
+  async monitorBridge(): Promise<void>;
+  
+  // Process events and update database
+  async processEvent(event: ContractEvent): Promise<void>;
+}
+```
+
+---
+
+## 🔄 Background Jobs
+
+### **Job Processors**
+```typescript
+// src/jobs/priceUpdater.ts
+// Update token prices every 30 seconds
+export class PriceUpdateJob {
+  async process(): Promise<void>;
+}
+
+// src/jobs/bridgeProcessor.ts
+// Process bridge transactions
+export class BridgeProcessorJob {
+  async processPendingBridges(): Promise<void>;
+}
+
+// src/jobs/analyticsCalculator.ts
+// Calculate 24h volume, market cap, etc.
+export class AnalyticsJob {
+  async calculateMetrics(): Promise<void>;
+}
+```
+
+---
+
+## 🔌 WebSocket Integration
+
+### **Real-time Updates**
+```typescript
+// src/websocket/handlers.ts
+export class WebSocketHandler {
+  // Token price updates
+  async broadcastPriceUpdate(tokenAddress: string, price: string): Promise<void>;
+  
+  // New transaction notifications
+  async broadcastTransaction(transaction: Transaction): Promise<void>;
+  
+  // Token graduation notifications
+  async broadcastGraduation(tokenAddress: string): Promise<void>;
+  
+  // User-specific updates
+  async sendUserUpdate(userAddress: string, data: any): Promise<void>;
+}
+```
+
+---
+
+## 🛡️ Security & Validation
+
+### **Middleware Implementation**
+```typescript
+// Authentication middleware
+export const authenticateJWT = (req: Request, res: Response, next: NextFunction);
+
+// Rate limiting
+export const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+// Input validation
+export const validateCreateToken = [
+  body('name').isLength({ min: 1, max: 50 }),
+  body('symbol').isLength({ min: 1, max: 10 }),
+  body('description').optional().isLength({ max: 500 })
+];
+
+// Wallet signature verification
+export const verifyWalletSignature = async (
+  message: string, 
+  signature: string, 
+  address: string
+): Promise<boolean>;
+```
+
+---
+
+## 📊 Error Handling & Logging
+
+### **Error Response Format**
+```typescript
+interface ErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+  timestamp: string;
+}
+
+// Custom error classes
+export class BlockchainError extends Error {
+  constructor(message: string, public txHash?: string) {
+    super(message);
+  }
+}
+
+export class InsufficientFundsError extends Error {}
+export class TokenNotFoundError extends Error {}
+export class BridgeError extends Error {}
+```
+
+### **Logging Configuration**
+```typescript
+// Winston logger setup for different environments
+export const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' }),
+    new winston.transports.Console()
+  ]
+});
+```
+
+---
+
+## 🧪 Testing Requirements
+
+### **Test Coverage**
+```typescript
+// Unit tests for services
+describe('TokenService', () => {
+  it('should create token with valid parameters');
+  it('should calculate bonding curve prices correctly');
+  it('should handle graduation logic');
+});
+
+// Integration tests for API endpoints
+describe('POST /api/tokens/create', () => {
+  it('should create token with authenticated user');
+  it('should reject invalid token parameters');
+  it('should handle blockchain errors gracefully');
+});
+
+// E2E tests for complete workflows
+describe('Token Creation Flow', () => {
+  it('should complete full token creation and trading cycle');
+});
+```
+
+---
+
+## 🚀 Deployment Configuration
+
+### **Environment Variables**
+```bash
+# Database
+DATABASE_URL="postgresql://user:pass@localhost:5432/risechain"
+REDIS_URL="redis://localhost:6379"
+
+# Blockchain
+RISE_CHAIN_RPC="https://testnet.riselabs.xyz"
+SEPOLIA_RPC="https://sepolia.infura.io/v3/YOUR_KEY"
+PRIVATE_KEY="your_wallet_private_key"
+
+# Contract Addresses
+TOKEN_FACTORY_ADDRESS="0x..."
+BRIDGE_CONTRACT_ADDRESS="0x..."
+
+# API
+JWT_SECRET="your_jwt_secret"
+API_PORT=3000
+
+# External Services
+INFURA_PROJECT_ID="your_infura_id"
+REDIS_URL="redis://localhost:6379"
+```
+
+### **Docker Configuration**
+```dockerfile
+# Include Docker setup for production deployment
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+---
+
+
+
+## 📈 Performance Optimizations
+
+### **Caching Strategy**
+- Token prices cached for 30 seconds
+- User portfolios cached for 1 minute
+- Chart data cached for 5 minutes
+- Static data (token metadata) cached for 1 hour
+
+### **Database Optimization**
+- Indexes on frequently queried fields
+- Connection pooling
+- Read replicas for analytics queries
+- Automatic cleanup of old price history
+
+### **API Optimization**
+- Response compression
+- Pagination for large datasets
+- Field selection for API responses
+- Background processing for heavy operations
+
+---
+
+## 🎯 Additional Features to Implement
+
+1. **Notification System**: Email/webhook notifications for important events
+2. **Admin Dashboard**: Platform management and monitoring tools
+3. **Analytics Dashboard**: Real-time charts and statistics
+4. **Multi-language Support**: i18n for global users
+5. **Mobile API**: Optimized endpoints for mobile apps
+6. **Social Features**: Comments, ratings, and social trading
+7. **Advanced Trading**: Limit orders, stop-loss, DCA features
+
+---
+
+## 💡 Implementation Notes
+
+- Use **TypeScript** throughout for better type safety
+- Implement **circuit breakers** for external API calls
+- Add **health checks** for monitoring
+- Use **database migrations** for schema changes
+- Implement **graceful shutdown** handling
+- Add **comprehensive monitoring** with metrics
+- Use **queue systems** for resource-intensive operations
+- Implement **proper backup** strategies
+
+Generate a production-ready backend that follows these specifications with proper error handling, security measures, and scalable architecture patterns.
